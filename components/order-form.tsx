@@ -33,6 +33,8 @@ const cities = [
   "Autre",
 ]
 
+const GOOGLE_SHEET_URL = process.env.NEXT_PUBLIC_GOOGLE_SHEET_URL || ""
+
 export function OrderForm() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
   const [quantity, setQuantity] = useState("1")
@@ -46,13 +48,21 @@ export function OrderForm() {
     const data = Object.fromEntries(formData.entries())
 
     try {
-      const res = await fetch("/api/order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, quantity, total: 45 * parseInt(quantity) }),
-      })
-
-      if (!res.ok) throw new Error("Erreur lors de la commande")
+      if (GOOGLE_SHEET_URL) {
+        await fetch(GOOGLE_SHEET_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify({
+            date: new Date().toLocaleString("fr-FR", { timeZone: "Africa/Casablanca" }),
+            name: data.name,
+            phone: data.phone,
+            city: data.city,
+            address: data.address,
+            quantity,
+            total: `${45 * parseInt(quantity)} Dhs`,
+          }),
+        })
+      }
 
       setStatus("success")
       form.reset()
