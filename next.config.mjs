@@ -4,6 +4,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  basePath: '/ECOMME',
+  assetPrefix: '/ECOMME/',
 }
 
 export default nextConfig
